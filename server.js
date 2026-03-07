@@ -13,40 +13,9 @@ const pool = new Pool({
 });
 
 // 1. ดึงข้อมูล Dashboard & ค้นหา/กรองงาน
-app.get('/api/tasks', async (req, res) => {
-  const { user_id, search, status } = req.query;
-  try {
-    let query = 'SELECT * FROM tasks WHERE user_id = $1';
-    let params = [user_id || 1]; // ค่าเริ่มต้น 1 สำหรับทดสอบ
-    let paramIndex = 2;
-
-    if (search) {
-      query += ` AND title ILIKE $${paramIndex}`;
-      params.push(`%${search}%`);
-      paramIndex++;
-    }
-    if (status && status !== 'all') {
-      query += ` AND status = $${paramIndex}`;
-      params.push(status);
-      paramIndex++;
-    }
-    query += ' ORDER BY due_date ASC';
-
-    const result = await pool.query(query, params);
-    const tasks = result.rows;
-
-    // สร้างข้อมูล Dashboard
-    const dashboard = {
-      total: tasks.length,
-      pending: tasks.filter(t => t.status === 'pending').length,
-      in_progress: tasks.filter(t => t.status === 'in_progress').length,
-      completed: tasks.filter(t => t.status === 'completed').length,
-    };
-
-    res.json({ dashboard, tasks });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// เพิ่มส่วนนี้เพื่อเช็คว่า Server ทำงานปกติที่หน้าแรก
+app.get('/', (req, res) => {
+  res.send('Backend Server is running properly!');
 });
 
 // 2. เพิ่มงานใหม่
